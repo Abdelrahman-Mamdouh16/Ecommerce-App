@@ -29,7 +29,7 @@ export const registerUser = async (req, res, next) => {
 
   //   create a JWT token for the new user
   const token = jwt.sign(
-    { id: newUser._id, email },
+    { id: newUser._id, email, tokenType: "activateToken" },
     process.env.JWT_SECRET_KEY,
     {
       expiresIn: "1h",
@@ -67,6 +67,8 @@ export const activateAccount = async (req, res, next) => {
   const { token } = req.params;
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
   if (!decodedToken) return next(new Error("Invalid token", { cause: 400 }));
+  if (decodedToken.tokenType !== "activateToken")
+    return next(new Error("Invalid token type", { cause: 400 }));
   // check if the user already exists in the database
   const isUserExist = await User.findOne({ email: decodedToken.email });
   if (!isUserExist) return next(new Error("User not found", { cause: 404 }));
@@ -76,35 +78,7 @@ export const activateAccount = async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Account activated successfully" });
 };
-// const reActivateAccount = async (req, res, next) => {
-//   const { token } = req.params;
-//   const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-//   if (!decodedToken) return next(new Error("Invalid token", { cause: 400 }));
-//   const isUserExist = await User.findById(decodedToken.id);
-//   if (!isUserExist) return next(new Error("User not found", { cause: 404 }));
-//   try {
-//     const sendEmailResult = await sendEmail({
-//       to: isUserExist.email,
-//       subject: "Confirm your email",
-//       html: registerHTMLEmailTemplate(
-//         `${process.env.BASE_URL}/api/auth/confirm/${token}`,
-//       ),
-//     });
-//     if (!sendEmailResult)
-//       return next(
-//         new Error("Failed to send confirmation email please try again", {
-//           cause: 500,
-//         }),
-//       );
-//   } catch (err) {
-//     console.log(err);
-//     return next(
-//       new Error("Failed to send confirmation email please try again", {
-//         cause: 500,
-//       }),
-//     );
-//   }
-// };
+
 export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -119,7 +93,7 @@ export const loginUser = async (req, res, next) => {
     );
 
   const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "1h",
+    expiresIn: "1w",
   });
   await Token.create({
     token,
@@ -131,6 +105,7 @@ export const loginUser = async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Login successful", token });
 };
+
 export const forgotPasswordCode = async (req, res, next) => {
   const { email } = req.params;
   const isUserExist = await User.findOne({ email });

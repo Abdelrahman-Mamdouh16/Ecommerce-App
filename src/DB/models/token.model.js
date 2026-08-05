@@ -15,7 +15,8 @@ const tokenSchema = new Schema(
       type: String,
     },
     expiredAt: {
-      type: String,
+      type: Date,
+      default: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
     },
   },
   { timestamps: true },

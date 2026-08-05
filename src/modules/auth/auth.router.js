@@ -10,16 +10,12 @@ authRouter.post(
   validationMiddleware(authSchema.registerSchema),
   asyncHandler(authController.registerUser),
 );
+
 authRouter.get(
   "/confirm/:token",
   validationMiddleware(authSchema.activateAccountSchema),
   asyncHandler(authController.activateAccount),
 );
-// authRouter.get(
-//   "/reconfirm/:token",
-//   validationMiddleware(authSchema.activateAccountSchema),
-//   asyncHandler(authController.reActivateAccount),
-// );
 
 authRouter.post(
   "/login",
@@ -32,6 +28,7 @@ authRouter.get(
   validationMiddleware(authSchema.forgotPasswordSchema),
   asyncHandler(authController.forgotPasswordCode),
 );
+
 authRouter.post(
   "/reset-password",
   validationMiddleware(authSchema.resetPasswordSchema),
