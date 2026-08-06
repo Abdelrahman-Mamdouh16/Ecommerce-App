@@ -1,11 +1,11 @@
 import bcryptjs from "bcryptjs";
-import { User } from "../../DB/models/user.model.js";
 import jwt from "jsonwebtoken";
-import { sendEmail } from "../../utils/sendEmail/sendEmails.js";
-import { registerEmailTemplate } from "../../utils/sendEmail/partial/registerEmailTemplate.js";
-import { Token } from "../../DB/models/token.model.js";
-import { restCodeTemplate } from "../../utils/sendEmail/partial/restCodeTemplate.js";
 import Randomstring from "randomstring";
+import { Token } from "../../DB/models/token.model.js";
+import { User } from "../../DB/models/user.model.js";
+import { registerEmailTemplate } from "../../utils/sendEmail/partial/registerEmailTemplate.js";
+import { restCodeTemplate } from "../../utils/sendEmail/partial/restCodeTemplate.js";
+import { sendEmail } from "../../utils/sendEmail/sendEmails.js";
 export const registerUser = async (req, res, next) => {
   // get the user data from the request body
   const { username, email, age, gender, phone, password } = req.body;
@@ -45,7 +45,7 @@ export const registerUser = async (req, res, next) => {
       subject: "Confirm your email",
       html: registerEmailTemplate(confirmationLink),
     });
-  } catch (err) {
+  } catch {
     // Phase One: If sending the email fails, delete the user from the database and return an error
     await User.findByIdAndDelete(newUser._id);
     // phase Two: make user re-send the confirmation email by creating a new token and sending it to the user's email
@@ -126,7 +126,7 @@ export const forgotPasswordCode = async (req, res, next) => {
   isUserExist.forgetPasswordCodeExpiresAt = new Date(
     Date.now() + 10 * 60 * 1000,
   ); // 10 minutes from now
-  const user = await isUserExist.save();
+  await isUserExist.save();
 
   const sendForgotPasswordCode = await sendEmail({
     to: email,
@@ -146,7 +146,7 @@ export const forgotPasswordCode = async (req, res, next) => {
 };
 
 export const resetPassword = async (req, res, next) => {
-  const { email, password, confirmPassword, forgetPasswordCode } = req.body;
+  const { email, password, forgetPasswordCode } = req.body;
   const isUserExist = await User.findOne({ email });
   if (!isUserExist)
     return res.status(404).json({ success: false, message: "User not found" });
@@ -178,10 +178,7 @@ export const resetPassword = async (req, res, next) => {
   isUserExist.forgetPasswordCode = null;
   isUserExist.forgetPasswordCodeExpiresAt = null;
   await isUserExist.save();
-  const result = await Token.updateMany(
-    { userId: isUserExist._id },
-    { isValid: false },
-  );
+  await Token.updateMany({ userId: isUserExist._id }, { isValid: false });
   // console.log(token);
 
   return res

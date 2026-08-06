@@ -14,7 +14,7 @@ categoryRouter.post(
   "/createCategory",
   isAuthenticated,
   isAuthorized("admin"),
-  fileUpload().single("category"),
+  fileUpload("category"),
   validationMiddleware(categorySchema.createCategorySchema),
   asyncHandler(categoryController.createCategory),
 );
@@ -22,6 +22,22 @@ categoryRouter.post(
 // Get All Categories or specific category by ID
 
 // update Category
+categoryRouter.patch(
+  "/updateCategory/:categoryId",
+  isAuthenticated,
+  isAuthorized("admin"),
+  fileUpload("category"),
+  validationMiddleware(categorySchema.updateCategorySchema),
+  asyncHandler(categoryController.updateCategory),
+);
 
 // delete Category
+categoryRouter.delete(
+  "/deleteCategory/:categoryId",
+  isAuthenticated,
+  isAuthorized("admin"),
+  validationMiddleware(categorySchema.deleteCategorySchema),
+  asyncHandler(categoryController.deleteCategory),
+);
+
 export default categoryRouter;

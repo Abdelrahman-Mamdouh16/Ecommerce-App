@@ -29,3 +29,8 @@ export const validationMiddleware = (schema) => {
     return next();
   };
 };
+// export const isValidObjectId = (id) => {
+//   if (!Types.ObjectId.isValid(id)) return false;
+
+//   return true;
+// };

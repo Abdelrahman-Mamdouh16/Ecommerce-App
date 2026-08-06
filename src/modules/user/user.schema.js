@@ -1,5 +1,5 @@
 import joi from "joi";
-import { Types } from "mongoose";
+import { isValidObjectId } from "mongoose";
 
 export const updateUserRoleSchema = {
   params: joi
@@ -7,7 +7,7 @@ export const updateUserRoleSchema = {
       id: joi
         .string()
         .custom((value, helpers) => {
-          if (!Types.ObjectId.isValid(value))
+          if (isValidObjectId(value) === false)
             return helpers.message("Invalid user ID");
           return value;
         })

@@ -19,4 +19,4 @@ const categorySchema = new Schema(
   { timestamps: true  },
 );
 
-export const categoryModel = model("Category", categorySchema);
+export const Category = model("Category", categorySchema);
