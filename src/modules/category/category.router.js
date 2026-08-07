@@ -20,6 +20,20 @@ categoryRouter.post(
 );
 
 // Get All Categories or specific category by ID
+categoryRouter.get(
+  "/getAllCategories",
+  isAuthenticated,
+  // isAuthorized("admin"),
+  // validationMiddleware(categorySchema.deleteCategorySchema),
+  asyncHandler(categoryController.getAllCategories),
+);
+categoryRouter.get(
+  "/getCategory/:categoryId",
+  isAuthenticated,
+  // isAuthorized("admin"),
+  validationMiddleware(categorySchema.getCategoryByIdSchema),
+  asyncHandler(categoryController.getCategoryById),
+);
 
 // update Category
 categoryRouter.patch(

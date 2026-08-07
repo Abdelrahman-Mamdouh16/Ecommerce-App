@@ -8,11 +8,15 @@ export const createCategory = async (req, res, next) => {
     return next(new Error("Category image is required", { cause: 400 }));
   // upload the image to cloudinary
 
-  const slug = slugify(req.body.name);
+  const slug = slugify(req.body.name, { lower: true });
   const isCategoryExist = await Category.findOne({
-    name: req.body.name,
+    // name: req.body.name||
     slug,
   });
+  console.log(req.body.name);
+  console.log(slug);
+  console.log(isCategoryExist);
+
   if (isCategoryExist) {
     return next(new Error("'name' of Category already exists", { cause: 400 }));
   }
@@ -58,7 +62,7 @@ export const updateCategory = async (req, res, next) => {
   }
   isCategoryExist.name = req.body.name ? req.body.name : isCategoryExist.name;
   isCategoryExist.slug = req.body.name
-    ? slugify(req.body.name)
+    ? slugify(req.body.name, { lower: true })
     : isCategoryExist.slug;
   await isCategoryExist.save();
   return res.status(200).json({
@@ -79,11 +83,31 @@ export const deleteCategory = async (req, res, next) => {
         cause: 403,
       }),
     );
-    await cloudinary.uploader.destroy(isCategoryExist.image.id);
-    await isCategoryExist.remove();
+  await cloudinary.uploader.destroy(isCategoryExist.image.id);
+  await isCategoryExist.deleteOne();
 
   return res.status(200).json({
     success: true,
     message: "Category deleted successfully",
+  });
+};
+export const getCategoryById = async (req, res, next) => {
+  const { categoryId } = req.params;
+  const isCategoryExist = await Category.findById(categoryId);
+  if (!isCategoryExist) {
+    return next(new Error("Category not found", { cause: 404 }));
+  }
+  return res.status(200).json({
+    success: true,
+    message: "Category retrieved successfully",
+    data: isCategoryExist,
+  });
+};
+export const getAllCategories = async (req, res, next) => {
+  const categories = await Category.find();
+  return res.status(200).json({
+    success: true,
+    message: "Categories retrieved successfully",
+    data: categories,
   });
 };

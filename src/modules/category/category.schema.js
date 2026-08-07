@@ -53,3 +53,17 @@ export const deleteCategorySchema = {
     })
     .required(),
 };
+export const getCategoryByIdSchema = {
+  params: joi
+    .object({
+      categoryId: joi
+        .string()
+        .custom((value, helpers) => {
+          if (isValidObjectId(value) === false)
+            return helpers.message("Invalid category ID");
+          return value;
+        })
+        .required(),
+    })
+    .required(),
+};
