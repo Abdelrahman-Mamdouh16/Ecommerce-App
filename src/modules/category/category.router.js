@@ -6,9 +6,11 @@ import * as categoryController from "./category.controller.js";
 import { asyncHandler } from "../../utils/asyncHandlers.js";
 import { fileUpload } from "../../utils/fileUploads/fileUpload.js";
 import * as categorySchema from "./category.schema.js";
+import subcategoryRouter from "../subcategory/subcategory.router.js";
 
 const categoryRouter = Router();
-
+// Subcategory Routes
+categoryRouter.use("/:category_Id/subcategory", subcategoryRouter);
 // Create Category
 categoryRouter.post(
   "/createCategory",

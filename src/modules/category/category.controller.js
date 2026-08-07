@@ -4,18 +4,19 @@ import cloudinary from "../../utils/fileUploads/cloud.js";
 
 export const createCategory = async (req, res, next) => {
   // check if the category image is provided
+  const { name } = req.body;
   if (!req.file)
     return next(new Error("Category image is required", { cause: 400 }));
   // upload the image to cloudinary
 
-  const slug = slugify(req.body.name, { lower: true });
+  const slug = slugify(name, { lower: true });
   const isCategoryExist = await Category.findOne({
     // name: req.body.name||
     slug,
   });
-  console.log(req.body.name);
-  console.log(slug);
-  console.log(isCategoryExist);
+  // console.log(req.body.name);
+  // console.log(slug);
+  // console.log(isCategoryExist);
 
   if (isCategoryExist) {
     return next(new Error("'name' of Category already exists", { cause: 400 }));
@@ -28,7 +29,7 @@ export const createCategory = async (req, res, next) => {
   );
   // create the category in the database
   const newCategory = await Category.create({
-    name: req.body.name,
+    name,
     slug,
     createdBy: req.user._id,
     image: { id: public_id, url: secure_url },
@@ -93,7 +94,7 @@ export const deleteCategory = async (req, res, next) => {
 };
 export const getCategoryById = async (req, res, next) => {
   const { categoryId } = req.params;
-  const isCategoryExist = await Category.findById(categoryId);
+  const isCategoryExist = await Category.findById(categoryId).populate("subcategories");
   if (!isCategoryExist) {
     return next(new Error("Category not found", { cause: 404 }));
   }
