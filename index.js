@@ -5,6 +5,7 @@ import authRouter from "./src/modules/auth/auth.router.js";
 import categoryRouter from "./src/modules/category/category.router.js";
 import userRouter from "./src/modules/user/user.router.js";
 import brandRouter from "./src/modules/brand/brand.router.js";
+import couponRouter from "./src/modules/coupon/coupon.router.js";
 // import multer from "multer";
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +25,8 @@ app.use("/api/user", userRouter);
 app.use("/api/category", categoryRouter);
 // Brand Routes
 app.use("/api/brand", brandRouter);
+// Coupon Routes
+app.use("/api/coupon", couponRouter);
 
 
 // NotFound Routes
