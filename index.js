@@ -4,6 +4,7 @@ import { connectDB } from "./src/DB/DBConnection.js";
 import authRouter from "./src/modules/auth/auth.router.js";
 import categoryRouter from "./src/modules/category/category.router.js";
 import userRouter from "./src/modules/user/user.router.js";
+import brandRouter from "./src/modules/brand/brand.router.js";
 // import multer from "multer";
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,6 +22,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 // Category Routes
 app.use("/api/category", categoryRouter);
+// Brand Routes
+app.use("/api/brand", brandRouter);
 
 
 // NotFound Routes

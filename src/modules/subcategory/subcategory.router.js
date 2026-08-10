@@ -2,12 +2,12 @@ import { Router } from "express";
 import { isAuthenticated } from "../../middleware/authentication.middleware.js";
 import { validationMiddleware } from "../../middleware/validation.middleware.js";
 import { isAuthorized } from "../../middleware/authorization.middleware.js";
-import * as categoryController from "./subcategory.controller.js";
 import { asyncHandler } from "../../utils/asyncHandlers.js";
 import { fileUpload } from "../../utils/fileUploads/fileUpload.js";
-import * as categorySchema from "./subcategory.schema.js";
+import * as subcategorySchema from "./subcategory.schema.js";
+import * as categoryController from "./subcategory.controller.js";
 
-const subcategoryRouter = Router({mergeParams: true});
+const subcategoryRouter = Router({ mergeParams: true });
 
 // Create Subcategory
 subcategoryRouter.post(
@@ -15,7 +15,7 @@ subcategoryRouter.post(
   isAuthenticated,
   isAuthorized("admin"),
   fileUpload("subcategory"),
-  validationMiddleware(categorySchema.createSubcategorySchema),
+  validationMiddleware(subcategorySchema.createSubcategorySchema),
   asyncHandler(categoryController.createSubcategory),
 );
 
@@ -32,7 +32,7 @@ subcategoryRouter.get(
   "/getSubcategory/:subcategory_Id",
   isAuthenticated,
   // isAuthorized("admin"),
-  validationMiddleware(categorySchema.getSubcategoryByIdSchema),
+  validationMiddleware(subcategorySchema.getSubcategoryByIdSchema),
   asyncHandler(categoryController.getSubcategoryById),
 );
 
@@ -42,7 +42,7 @@ subcategoryRouter.patch(
   isAuthenticated,
   isAuthorized("admin"),
   fileUpload("subcategory"),
-  validationMiddleware(categorySchema.updateSubcategorySchema),
+  validationMiddleware(subcategorySchema.updateSubcategorySchema),
   asyncHandler(categoryController.updateSubcategory),
 );
 
@@ -51,7 +51,7 @@ subcategoryRouter.delete(
   "/deleteSubcategory/:subcategory_Id",
   isAuthenticated,
   isAuthorized("admin"),
-  validationMiddleware(categorySchema.deleteSubcategorySchema),
+  validationMiddleware(subcategorySchema.deleteSubcategorySchema),
   asyncHandler(categoryController.deleteSubcategory),
 );
 
