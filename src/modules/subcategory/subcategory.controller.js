@@ -101,9 +101,7 @@ export const updateSubcategory = async (req, res, next) => {
     });
 
     if (isSlugExist) {
-      return next(
-        new Error("Subcategory name already exists", { cause: 400 }),
-      );
+      return next(new Error("Subcategory name already exists", { cause: 400 }));
     }
 
     subcategory.name = name;
@@ -112,10 +110,16 @@ export const updateSubcategory = async (req, res, next) => {
 
   // Update image if provided
   if (req.file) {
+    const oldImageId = subcategory.image.id;
+
+    // Delete old image
+    await cloudinary.uploader.destroy(oldImageId);
+
+    // Upload new image
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
       {
-        public_id: subcategory.image.id,
+        folder: `${process.env.CLOUDINARY_CLOUD_FOLDER}/subcategory`,
       },
     );
 

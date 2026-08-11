@@ -96,10 +96,16 @@ export const updateBrandById = async (req, res, next) => {
 
   // Update image
   if (req.file) {
+    const oldImageId = brand.image.id;
+
+    // Delete old image
+    await cloudinary.uploader.destroy(oldImageId);
+
+    // Upload new image
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
       {
-        public_id: brand.image.id,
+        folder: `${process.env.CLOUDINARY_CLOUD_FOLDER}/brand`,
       },
     );
 
@@ -108,7 +114,6 @@ export const updateBrandById = async (req, res, next) => {
       url: secure_url,
     };
   }
-
   // Save changes
   await brand.save();
 
@@ -143,7 +148,7 @@ export const deleteBrandById = async (req, res, next) => {
   await cloudinary.uploader.destroy(brand.image.public_id);
 
   // Delete Brand
-  await Brand.findByIdAndDelete(brand_Id);
+  await brand.deleteOne();
 
   return res.status(200).json({
     success: true,

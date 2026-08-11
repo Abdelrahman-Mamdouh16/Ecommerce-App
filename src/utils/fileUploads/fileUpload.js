@@ -1,14 +1,5 @@
 import multer, { diskStorage } from "multer";
 
-// export const fileUpload = () => {
-//   const fileFilter = (req, file, cb) => {
-//     if (!["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype))
-//       return cb(new Error("Invalid file type", { cause: 400 }), false);
-//     return cb(null, true);
-//   };
-//   return multer({ storage: diskStorage({}), fileFilter });
-// };
-
 export const fileUpload = (fieldName) => {
   const fileFilter = (req, file, cb) => {
     if (!["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype)) {
@@ -17,11 +8,18 @@ export const fileUpload = (fieldName) => {
 
     return cb(null, true);
   };
-
-  const upload = multer({
-    storage: diskStorage({}),
-    fileFilter,
-  }).single(fieldName);
+  let upload;
+  if (typeof fieldName === "string") {
+    upload = multer({
+      storage: diskStorage({}),
+      fileFilter,
+    }).single(fieldName);
+  } else {
+    upload = multer({
+      storage: diskStorage({}),
+      fileFilter,
+    }).fields(fieldName);
+  }
 
   return (req, res, next) => {
     upload(req, res, (err) => {

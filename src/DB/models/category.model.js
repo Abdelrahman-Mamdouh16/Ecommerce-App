@@ -1,4 +1,6 @@
 import { model, Schema, Types } from "mongoose";
+import { Subcategory } from "./subcategory.model.js";
+import cloudinary from "../../utils/fileUploads/cloud.js";
 
 const categorySchema = new Schema(
   {
@@ -27,4 +29,13 @@ categorySchema.virtual("subcategories", {
   localField: "_id",
   foreignField: "categoryId",
 });
+
+categorySchema.post(
+  "deleteOne",
+  { document: true, query: false },
+  async function () {
+    await Subcategory.deleteMany({ categoryId: this._id });
+    await cloudinary.uploader.destroy(this.image.id);
+  },
+);
 export const Category = model("Category", categorySchema);

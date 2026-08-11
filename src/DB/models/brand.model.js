@@ -1,4 +1,5 @@
 import { model, Schema, Types } from "mongoose";
+import cloudinary from "../../utils/fileUploads/cloud.js";
 
 const brandSchema = new Schema(
   {
@@ -18,5 +19,11 @@ const brandSchema = new Schema(
   },
   { timestamps: true },
 );
-
+brandSchema.post(
+  "deleteOne",
+  { document: true, query: false },
+  async function () {
+    await cloudinary.uploader.destroy(this.image.id);
+  },
+);
 export const Brand = model("Brand", brandSchema);

@@ -55,11 +55,21 @@ export const updateCategory = async (req, res, next) => {
       }),
     );
   if (req.file) {
+    const oldPublicId = isCategoryExist.image.id;
+
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
-      { public_id: isCategoryExist.image.id },
+      {
+        folder: `${process.env.CLOUDINARY_CLOUD_FOLDER}/category`,
+      },
     );
-    isCategoryExist.image = { id: public_id, url: secure_url };
+
+    await cloudinary.uploader.destroy(oldPublicId);
+
+    isCategoryExist.image = {
+      id: public_id,
+      url: secure_url,
+    };
   }
   isCategoryExist.name = req.body.name ? req.body.name : isCategoryExist.name;
   isCategoryExist.slug = req.body.name
@@ -84,7 +94,6 @@ export const deleteCategory = async (req, res, next) => {
         cause: 403,
       }),
     );
-  await cloudinary.uploader.destroy(isCategoryExist.image.id);
   await isCategoryExist.deleteOne();
 
   return res.status(200).json({
@@ -94,7 +103,8 @@ export const deleteCategory = async (req, res, next) => {
 };
 export const getCategoryById = async (req, res, next) => {
   const { categoryId } = req.params;
-  const isCategoryExist = await Category.findById(categoryId).populate("subcategories");
+  const isCategoryExist =
+    await Category.findById(categoryId).populate("subcategories");
   if (!isCategoryExist) {
     return next(new Error("Category not found", { cause: 404 }));
   }
