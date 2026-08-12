@@ -7,6 +7,7 @@ import userRouter from "./src/modules/user/user.router.js";
 import brandRouter from "./src/modules/brand/brand.router.js";
 import couponRouter from "./src/modules/coupon/coupon.router.js";
 import productRouter from "./src/modules/product/product.router.js";
+import cartRouter from "./src/modules/cart/cart.router.js";
 // import multer from "multer";
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,6 +31,8 @@ app.use("/api/brand", brandRouter);
 app.use("/api/coupon", couponRouter);
 // product Routes
 app.use("/api/product", productRouter);
+// cart Routes
+app.use("/api/cart", cartRouter);
 
 
 // NotFound Routes

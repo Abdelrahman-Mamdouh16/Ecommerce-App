@@ -6,6 +6,7 @@ import { User } from "../../DB/models/user.model.js";
 import { registerEmailTemplate } from "../../utils/sendEmail/partial/registerEmailTemplate.js";
 import { restCodeTemplate } from "../../utils/sendEmail/partial/restCodeTemplate.js";
 import { sendEmail } from "../../utils/sendEmail/sendEmails.js";
+import { Cart } from "../../DB/models/cart.model.js";
 
 export const registerUser = async (req, res, next) => {
   // get the user data from the request body
@@ -66,6 +67,7 @@ export const activateAccount = async (req, res, next) => {
   const isUserExist = await User.findOne({ email });
   if (!isUserExist) return next(new Error("User not found", { cause: 404 }));
   // update the user's account status
+  await Cart.create({ userId: isUserExist._id });
   await User.findByIdAndUpdate(isUserExist._id, { isConfirmed: true });
   return res
     .status(200)
