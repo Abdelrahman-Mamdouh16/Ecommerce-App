@@ -60,7 +60,11 @@ export const createProduct = async (req, res, next) => {
 };
 
 export const getAllProducts = async (req, res, next) => {
-  const products = await Product.find()
+  const { sort, page, keyword } = req.query;
+  const products = await Product.find({ ...req.query })
+    .sort(sort)
+    .search(keyword)
+    .paginate(page)
     .populate("category")
     .populate("subcategory")
     .populate("brand")

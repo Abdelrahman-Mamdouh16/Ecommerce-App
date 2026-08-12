@@ -6,25 +6,18 @@ import { User } from "../../DB/models/user.model.js";
 import { registerEmailTemplate } from "../../utils/sendEmail/partial/registerEmailTemplate.js";
 import { restCodeTemplate } from "../../utils/sendEmail/partial/restCodeTemplate.js";
 import { sendEmail } from "../../utils/sendEmail/sendEmails.js";
+
 export const registerUser = async (req, res, next) => {
   // get the user data from the request body
-  const { username, email, age, gender, phone, password } = req.body;
+  const { email } = req.body;
   // check if the user already exists in the database
   const isUserExist = await User.findOne({ email });
   if (isUserExist)
     return next(new Error("User already exists", { cause: 409 }));
   // hash the password and create a new user in the database
-  const passwordHashed = await bcryptjs.hash(
-    password,
-    parseInt(process.env.SALT_ROUNDS),
-  );
+
   const newUser = await User.create({
-    username,
-    email,
-    age,
-    gender,
-    phone,
-    password: passwordHashed,
+    ...req.body,
   });
 
   //   create a JWT token for the new user
@@ -65,12 +58,12 @@ export const registerUser = async (req, res, next) => {
 export const activateAccount = async (req, res, next) => {
   // get the user data from the request body
   const { token } = req.params;
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  if (!decodedToken) return next(new Error("Invalid token", { cause: 400 }));
-  if (decodedToken.tokenType !== "activateToken")
+  const { email, tokenType } = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  if (!email) return next(new Error("Invalid token", { cause: 400 }));
+  if (tokenType !== "activateToken")
     return next(new Error("Invalid token type", { cause: 400 }));
   // check if the user already exists in the database
-  const isUserExist = await User.findOne({ email: decodedToken.email });
+  const isUserExist = await User.findOne({ email });
   if (!isUserExist) return next(new Error("User not found", { cause: 404 }));
   // update the user's account status
   await User.findByIdAndUpdate(isUserExist._id, { isConfirmed: true });
@@ -170,11 +163,8 @@ export const resetPassword = async (req, res, next) => {
       }),
     );
   }
-  const passwordHashed = await bcryptjs.hash(
-    password,
-    parseInt(process.env.SALT_ROUNDS),
-  );
-  isUserExist.password = passwordHashed;
+
+  isUserExist.password = password;
   isUserExist.forgetPasswordCode = null;
   isUserExist.forgetPasswordCodeExpiresAt = null;
   await isUserExist.save();

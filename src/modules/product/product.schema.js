@@ -113,6 +113,16 @@ export const getProductByIdSchema = {
     })
     .required(),
 };
+// export const getAllProductsSchema = {
+//   query: joi.object({
+//     keyword: joi.string().messages({
+//       "string.base": "Product keyword must be a string",
+//       "string.empty": "Product keyword is empty please Enter text to search",
+//       // "any.required": "Product keyword is required",
+//     }),
+//   }),
+//   // .required(),
+// };
 
 export const updateProductSchema = {
   body: joi
