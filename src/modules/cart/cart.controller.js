@@ -16,7 +16,7 @@ export const addToCart = async (req, res, next) => {
   }
 
   // 2. Check stock
-  if (quantity > product.quantity) {
+  if (!product.inStock(quantity)) {
     return next(
       new Error("Requested quantity exceeds available stock", {
         cause: 400,
@@ -51,7 +51,7 @@ export const addToCart = async (req, res, next) => {
     // 5. Product already exists → increase quantity
     const newQuantity = cartProduct.quantity + quantity;
 
-    if (newQuantity > product.quantity) {
+    if (!product.inStock(newQuantity)) {
       return next(
         new Error("Requested quantity exceeds available stock", {
           cause: 400,
@@ -130,7 +130,7 @@ export const updateCart = async (req, res, next) => {
     return next(new Error("Product not found in cart", { cause: 404 }));
   }
 
-  if (quantity > product.quantity) {
+  if (!product.inStock(quantity)) {
     return next(
       new Error("Requested quantity exceeds available stock", { cause: 400 }),
     );
@@ -204,5 +204,3 @@ export const clearCart = async (req, res, next) => {
     message: "Cart cleared successfully",
   });
 };
-
-

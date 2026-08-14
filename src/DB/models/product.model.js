@@ -66,11 +66,13 @@ const productSchema = new Schema(
     toObject: { virtuals: true },
   },
 );
+
 productSchema.virtual("finalPrice").get(function () {
   return Number.parseFloat(
     this.price - (this.price * this.discount || 0) / 100,
   ).toFixed(2);
 });
+
 productSchema.post(
   "deleteOne",
   { document: true, query: false },
@@ -85,17 +87,23 @@ productSchema.post(
     );
   },
 );
+
 productSchema.query.paginate = function (page) {
   page = page < 1 || isNaN(page) || !page ? 1 : page;
   const limit = 10;
   const skip = (page - 1) * limit;
   return this.skip(skip).limit(limit);
 };
+
 productSchema.query.search = function (keyword) {
-  if(!keyword || keyword === "undefined" || keyword === "null") return this;
+  if (!keyword || keyword === "undefined" || keyword === "null") return this;
   return this.find({
     name: { $regex: keyword, $options: "i" },
   });
+};
+
+productSchema.methods.inStock = function (quantity) {
+  return this.quantity >= quantity ? true : false;
 };
 
 export const Product = model("Product", productSchema);
